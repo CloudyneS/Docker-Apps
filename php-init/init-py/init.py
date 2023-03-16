@@ -110,10 +110,7 @@ if __name__ == '__main__':
     syncFolders('/tmp/app/', '/app/', True, 'web/app')
     
     pr.ok("Moving data to persistent volume...")
-    syncFolders('/tmp/app/web/app/', '/app/web/app/', True, ['uploads', 'plugins'])
-
-    pr.ok("Setting permissions...")
-    runCommand('chown -R nobody:root /app || true')
+    syncFolders('/tmp/app/web/app/', '/app/web/app/', True)
 
     pr.ok('Finished files, checking database...')
     if envv.get('IMPORT_DATABASE', False):
