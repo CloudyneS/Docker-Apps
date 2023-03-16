@@ -11,14 +11,12 @@ USER root
 RUN apk add --no-cache nginx supervisor
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
-ADD sendmail /usr/sbin/sendmail
 
 RUN chown -R nobody.nobody \
     /run \
     /app \
     /var/lib/nginx \
-    /var/log/nginx && \
-    chmod 755 /usr/sbin/sendmail
+    /var/log/nginx
 
 USER nobody
 
