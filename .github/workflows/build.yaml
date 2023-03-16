@@ -11,15 +11,17 @@ jobs:
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
+      
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+      
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: cloudynes
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Build and push base image (php8.0/alpine3.16)
         uses: docker/build-push-action@v2
         with:
@@ -29,13 +31,13 @@ jobs:
           build-args: |
             PHP_VERSION=8.0
             ALPINE_VERSION=3.16
-          tags:
-            - ghcr.io/cloudynes/php-base:latest
-            - ghcr.io/cloudynes/php-base:fpm-alpine
-            - ghcr.io/cloudynes/php-base:fpm8.0-alpine3.16
-            - ghcr.io/cloudynes/php-base:fpm8.0-alpine
-            - ghcr.io/cloudynes/php-base:fpm-alpine3.16
-      
+          tags: |
+            ghcr.io/cloudynes/php-base:latest
+            ghcr.io/cloudynes/php-base:fpm-alpine
+            ghcr.io/cloudynes/php-base:fpm8.0-alpine3.16
+            ghcr.io/cloudynes/php-base:fpm8.0-alpine
+            ghcr.io/cloudynes/php-base:fpm-alpine3.16
+
       - name: Build and push nginx image (nginx:1.21.3-alpine)
         uses: docker/build-push-action@v2
         with:
@@ -45,12 +47,12 @@ jobs:
           build-args: |
             PHP_VERSION=8.0
             ALPINE_VERSION=3.16
-          tags:
-            - ghcr.io/cloudynes/php-nginx:latest
-            - ghcr.io/cloudynes/php-base:fpm-alpine
-            - ghcr.io/cloudynes/php-base:fpm8.0-alpine3.16
-            - ghcr.io/cloudynes/php-base:fpm8.0-alpine
-            - ghcr.io/cloudynes/php-base:fpm-alpine3.16
+          tags: |
+            ghcr.io/cloudynes/php-nginx:latest
+            ghcr.io/cloudynes/php-base:fpm-alpine
+            ghcr.io/cloudynes/php-base:fpm8.0-alpine3.16
+            ghcr.io/cloudynes/php-base:fpm8.0-alpine
+            ghcr.io/cloudynes/php-base:fpm-alpine3.16
 
       - name: Build and push init image
         uses: docker/build-push-action@v2
@@ -61,9 +63,9 @@ jobs:
           build-args: |
             PHP_VERSION=8.0
             ALPINE_VERSION=3.16
-          tags:
-            - ghcr.io/cloudynes/php-init:latest
-            - ghcr.io/cloudynes/php-init:fpm-alpine
-            - ghcr.io/cloudynes/php-init:fpm8.0-alpine3.16
-            - ghcr.io/cloudynes/php-init:fpm8.0-alpine
-            - ghcr.io/cloudynes/php-init:fpm-alpine3.16
+          tags: |
+            ghcr.io/cloudynes/php-init:latest
+            ghcr.io/cloudynes/php-init:fpm-alpine
+            ghcr.io/cloudynes/php-init:fpm8.0-alpine3.16
+            ghcr.io/cloudynes/php-init:fpm8.0-alpine
+            ghcr.io/cloudynes/php-init:fpm-alpine3.16
