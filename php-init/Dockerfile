@@ -1,7 +1,7 @@
 ARG ALPINE_VERSION=3.17
 ARG PHP_VERSION=8.1
 ARG INIT_PACKAGES='nano bash net-tools wget zip tar curl git rsync p7zip python3 py3-pip py3-setuptools'
-FROM cloudyne/php-base:${PHP_VERSION}-fpm-alpine${ALPINE_VERSION}
+FROM ghcr.io/cloudynes/php-base:fpm${PHP_VERSION}-alpine${ALPINE_VERSION}
 
 LABEL Maintainer="Cloudyne Systems"
 LABEL Description="Lightweight PHP-FPM init container for Kubernetes based on Alpine Linux."
