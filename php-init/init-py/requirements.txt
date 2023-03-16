@@ -4,3 +4,4 @@ patool
 gitpython
 wget
 cprint
+rsyncy

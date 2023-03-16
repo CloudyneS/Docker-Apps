@@ -1,4 +1,4 @@
-import os, requests, subprocess, urllib, tempfile, patoolib, wget, sys
+import os, subprocess, patoolib, wget, sys
 from cprint.cprint import cprint as pr
 from time import sleep
 from git import Repo
@@ -25,7 +25,7 @@ def syncFolders(source: str, dest: str, print: bool = False, exclude: str = None
         exclude = ' '.join([f" --exclude '{x}' " for x in exclude])
     else:
         exclude = f"--exclude '{exclude}'"
-    command = f'rsync -a --info=progress2 {exclude} {source} {dest}'
+    command = f'rsync -ah --no-i-r --info=progress2 {exclude} {source} {dest} | rsyncy'
     if print:
         with subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=sys.stdout) as cmd:
             cmd.wait()
@@ -57,7 +57,7 @@ def getFromGit(url: str, destination: str):
     
     LOC = LOC[0]
     pr.info("Cloning from: " + LOC)
-    gitrepo = Repo.clone_from(LOC, path, progress=pr.info)
+    gitrepo = Repo.clone_from(LOC, destination, progress=pr.info)
     if BRANCH and gitrepo.active_branch.name != BRANCH:
         pr.info("Cloned, switching branch to " + BRANCH)
         gitrepo.git.checkout(BRANCH)
@@ -79,55 +79,70 @@ def fromArchiveOrGit(url, path):
 if __name__ == '__main__':
     envv = dict(os.environ)
     pr.info("Running initialization...")
-    pr.info("Creating project")
     
-    if not runCommand(
-        'composer create-project roots/bedrock --no-dev --no-interaction /tmp/app', b'No security vulnerability advisories found'
-    ):
-        pr.err("Could not create project")
-        exit(1)
-    
-    pr.ok("Project created, installing site")
-    if envv.get('INSTALL_SITE', False):
-        pr.info("Installing site from " + envv['INSTALL_SITE'])
+    if envv.get('RUN_COMPOSER', False):
+        # Always get newest version of roots/bedrock
         if not runCommand(
-            f'cd /tmp/app && composer require {envv["INSTALL_SITE"]} --no-interaction', b'No security vulnerability advisories found'
+            'composer create-project roots/bedrock --no-dev --no-interaction /tmp/app', b'No security vulnerability advisories found'
         ):
-            pr.err("Could not install site")
-            exit(1)
-        pr.info("Site installed")
+            pr.err("Could not create project")
+            exit(1)   
     
-    pr.ok("Site installed, importing content...")
-    if envv.get('IMPORT_CONTENT', False):
-        if not os.path.isfile('/app/web/app/imported.txt'):
+        # Download and install newest version of site
+        pr.ok("Project created, installing site")
+        if envv.get('INSTALL_SITE', False):
+            pr.info("Installing site from " + envv['INSTALL_SITE'])
+            if not runCommand(
+                f'cd /tmp/app && composer require {envv["INSTALL_SITE"]} --no-interaction', b'No security vulnerability advisories found'
+            ):
+                pr.err("Could not install site")
+                exit(1)
+            pr.info("Site installed")
+    
+        # Update the PV with the new site
+        pr.info("Moving all updated data to PV")
+        syncFolders('/tmp/app/', '/app/', True)
+    
+    if envv.get('RUN_IMPORTS', False):
+        pr.ok("Importing content...")
+
+        if envv.get('IMPORT_CONTENT', False):
             pr.info("Importing content from " + envv['IMPORT_CONTENT'])
-            fromArchiveOrGit(envv["IMPORT_CONTENT"], "/tmp/app/web/app")
-            with open('/tmp/app/web/app/imported.txt', 'w') as f:
-                f.write('Yes')
+            fromArchiveOrGit(envv["IMPORT_CONTENT"], "/tmp/imports")
+            pr.info("Successfully downloaded and extracted content, syncing to PV...")
+            syncFolders("/tmp/imports/", "/app/web/app/", True, ['plugins', 'themes', 'mu-plugins'])
             pr.info("Successfully imported data")
 
-    pr.info("Moving all data except PV")
-    syncFolders('/tmp/app/', '/app/', True, 'web/app')
-    
-    pr.ok("Moving data to persistent volume...")
-    syncFolders('/tmp/app/web/app/', '/app/web/app/', True)
-
-    pr.ok('Finished files, checking database...')
-    if envv.get('IMPORT_DATABASE', False):
+    if envv.get('RUN_DATABASEIMPORTS', False):
+        pr.ok("Importing database if not already installed...")
+        sql_file = ""
+        
         if not runCommand('cd /app && wp --allow-root core is-installed', b''):
-            pr.info('Database is not installed')
-            pr.info('Retrieving from ' + envv['IMPORT_DATABASE'])
+            pr.info("Database is not installed, retrieving and installing...")
+            sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
+        
+        elif envv.get('FORCE_IMPORT_DB', False):
+            pr.err("Database is already installed, but FORCE_IMPORT_DB is set so database will be replaced")
             sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
             
+            pr.err("Resetting database...")
+            if not runCommand(
+                'cd /app && wp db reset --yes', b''
+            ):
+                pr.err('Could not reset database, skipping import...')
+                sql_file = ""
+
+
+        if sql_file != "":
             if not runCommand(f'cd /app && ls -al && wp --allow-root db import {sql_file} && mv {sql_file} /backup/current.sql', b'Success'):
                 pr.err('Error importing database')
-                runCommand(f'cp -f {sql_file} /backup/current.sql && cp -f {sql_file} /app/import.sql')
                 exit(1)
-    
-    pr.ok("Finished database, setting theme...")
+
     if envv.get('SET_THEME', False):
-        pr.info("Setting theme to " + envv['SET_THEME'])
-        runCommand(f'cd /app && wp --allow-root theme activate {envv["SET_THEME"]}', b'')
+        pr.info("Ensuring that theme is set correctly...")
+        runCommand(
+            f'cd /app && wp --allow-root theme activate {envv["SET_THEME"]}', b''
+        )
     
-    pr.ok("Success!")
+    pr.ok("Successfully finished importing site!")
 
