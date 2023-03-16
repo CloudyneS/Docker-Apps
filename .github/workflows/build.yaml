@@ -25,8 +25,8 @@ jobs:
       - name: Build and push base image (php8.0/alpine3.16)
         uses: docker/build-push-action@v2
         with:
-          context: php-base
-          file: ./Dockerfile
+          context: ./php-base
+          file: Dockerfile
           push: true
           build-args: |
             PHP_VERSION=8.0
@@ -41,8 +41,8 @@ jobs:
       - name: Build and push nginx image (nginx:1.21.3-alpine)
         uses: docker/build-push-action@v2
         with:
-          context: nginx
-          file: ./Dockerfile
+          context: ./php-nginx
+          file: Dockerfile
           push: true
           build-args: |
             PHP_VERSION=8.0
@@ -57,8 +57,8 @@ jobs:
       - name: Build and push init image
         uses: docker/build-push-action@v2
         with:
-          context: init
-          file: ./Dockerfile
+          context: ./php-init
+          file: Dockerfile
           push: true
           build-args: |
             PHP_VERSION=8.0
