@@ -26,9 +26,9 @@ jobs:
           context: php-base
           file: ./Dockerfile
           push: true
-          build-args:
-            - PHP_VERSION=8.0
-            - ALPINE_VERSION=3.16
+          build-args: |
+            PHP_VERSION=8.0
+            ALPINE_VERSION=3.16
           tags:
             - ghcr.io/cloudynes/php-base:latest
             - ghcr.io/cloudynes/php-base:fpm-alpine
@@ -42,9 +42,9 @@ jobs:
           context: nginx
           file: ./Dockerfile
           push: true
-          build-args:
-            - PHP_VERSION=8.0
-            - ALPINE_VERSION=3.16
+          build-args: |
+            PHP_VERSION=8.0
+            ALPINE_VERSION=3.16
           tags:
             - ghcr.io/cloudynes/php-nginx:latest
             - ghcr.io/cloudynes/php-base:fpm-alpine
@@ -58,9 +58,9 @@ jobs:
           context: init
           file: ./Dockerfile
           push: true
-          build-args:
-            - PHP_VERSION=8.0
-            - ALPINE_VERSION=3.16
+          build-args: |
+            PHP_VERSION=8.0
+            ALPINE_VERSION=3.16
           tags:
             - ghcr.io/cloudynes/php-init:latest
             - ghcr.io/cloudynes/php-init:fpm-alpine
