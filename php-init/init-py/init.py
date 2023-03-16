@@ -75,12 +75,19 @@ def fromArchiveOrGit(url, path):
         return True
     raise Exception(f"Invalid URL {url}")
 
+def isConsideredFalse(test):
+    if isinstance(test, str):
+        return test.lower() in ['false', 'no', 'n', 'f', '0']
+    if isinstance(test, int):
+        return test == 0
+    return test == False
+
 
 if __name__ == '__main__':
     envv = dict(os.environ)
     pr.info("Running initialization...")
     
-    if envv.get('RUN_COMPOSER', False):
+    if isConsideredFalse(envv.get('RUN_COMPOSER', False)):
         # Always get newest version of roots/bedrock
         if not runCommand(
             'composer create-project roots/bedrock --no-dev --no-interaction /tmp/app', b'No security vulnerability advisories found'
@@ -90,7 +97,7 @@ if __name__ == '__main__':
     
         # Download and install newest version of site
         pr.ok("Project created, installing site")
-        if envv.get('INSTALL_SITE', False):
+        if isConsideredFalse(envv.get('INSTALL_SITE', False)):
             pr.info("Installing site from " + envv['INSTALL_SITE'])
             if not runCommand(
                 f'cd /tmp/app && composer require {envv["INSTALL_SITE"]} --no-interaction', b'No security vulnerability advisories found'
@@ -103,17 +110,17 @@ if __name__ == '__main__':
         pr.info("Moving all updated data to PV")
         syncFolders('/tmp/app/', '/app/', True)
     
-    if envv.get('RUN_IMPORTS', False):
+    if isConsideredFalse(envv.get('RUN_IMPORTS', False)):
         pr.ok("Importing content...")
 
-        if envv.get('IMPORT_CONTENT', False):
+        if isConsideredFalse(envv.get('IMPORT_CONTENT', False)):
             pr.info("Importing content from " + envv['IMPORT_CONTENT'])
             fromArchiveOrGit(envv["IMPORT_CONTENT"], "/tmp/imports")
             pr.info("Successfully downloaded and extracted content, syncing to PV...")
             syncFolders("/tmp/imports/", "/app/web/app/", True, ['plugins', 'themes', 'mu-plugins'])
             pr.info("Successfully imported data")
 
-    if envv.get('RUN_DATABASEIMPORTS', False):
+    if isConsideredFalse(envv.get('RUN_DATABASEIMPORTS', False)):
         pr.ok("Importing database if not already installed...")
         sql_file = ""
         
@@ -121,7 +128,7 @@ if __name__ == '__main__':
             pr.info("Database is not installed, retrieving and installing...")
             sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
         
-        elif envv.get('FORCE_IMPORT_DB', False):
+        elif isConsideredFalse(envv.get('FORCE_IMPORT_DB', False)):
             pr.err("Database is already installed, but FORCE_IMPORT_DB is set so database will be replaced")
             sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
             
@@ -134,11 +141,11 @@ if __name__ == '__main__':
 
 
         if sql_file != "":
-            if not runCommand(f'cd /app && ls -al && wp --allow-root db import {sql_file} && mv {sql_file} /backup/current.sql', b'Success'):
+            if not runCommand(f'cd /app && wp --allow-root db import {sql_file}', b'Success'):
                 pr.err('Error importing database')
                 exit(1)
 
-    if envv.get('SET_THEME', False):
+    if isConsideredFalse(envv.get('SET_THEME', False)):
         pr.info("Ensuring that theme is set correctly...")
         runCommand(
             f'cd /app && wp --allow-root theme activate {envv["SET_THEME"]}', b''
