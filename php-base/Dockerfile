@@ -39,7 +39,6 @@ RUN docker-php-ext-install -j$(nproc) \
 
 # Overwrite FPM Pool
 COPY www.conf /usr/local/etc/php-fpm.d/www.conf
-COPY php-fpm.conf /usr/local/etc/php-fpm.conf
 
 RUN rm /usr/local/etc/php-fpm.d/zz-docker.conf
 

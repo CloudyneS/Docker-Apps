@@ -1,5 +1,5 @@
-ARG ALPINE_VERSION=3.17
-ARG PHP_VERSION=8.1
+ARG ALPINE_VERSION=3.16
+ARG PHP_VERSION=8.0
 ARG INIT_PACKAGES='sudo nano bash net-tools wget zip tar curl git rsync p7zip python3 py3-pip py3-setuptools'
 FROM ghcr.io/cloudynes/php-base:fpm${PHP_VERSION}-alpine${ALPINE_VERSION}
 

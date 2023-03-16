@@ -1,6 +1,17 @@
 # php-apps
 PHP containers built for Kubernetes
 
+## Todo
+- [ ] Add support and images for PHP8.1
+- [ ] Add support and images for PHP7.4
+- [ ] Google tag manager plugin
+
+## Sendmail Configuration
+Environment variables:
+- SENDMAIL_SMART_HOST=somehost.com
+- SENDMAIL_SMART_LOGIN=user
+- SENDMAIL_SMART_PASSWORD=pass
+- 
 ## PHP 8.0
 ### PHP Base
 Source: php:8.0-fpm-alpine3.16

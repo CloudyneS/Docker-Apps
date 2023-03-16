@@ -1,5 +1,5 @@
-ARG ALPINE_VERSION=3.17
-ARG PHP_VERSION=8.1
+ARG ALPINE_VERSION=3.16
+ARG PHP_VERSION=8.0
 FROM ghcr.io/cloudynes/php-base:fpm${PHP_VERSION}-alpine${ALPINE_VERSION}
 
 LABEL Maintainer="Cloudyne Systems"
@@ -11,12 +11,14 @@ USER root
 RUN apk add --no-cache nginx supervisor
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY supervisor.conf /etc/supervisor/conf.d/supervisord.conf
+ADD sendmail /usr/sbin/sendmail
 
 RUN chown -R nobody.nobody \
     /run \
     /app \
     /var/lib/nginx \
-    /var/log/nginx
+    /var/log/nginx && \
+    chmod 755 /usr/sbin/sendmail
 
 USER nobody
 
