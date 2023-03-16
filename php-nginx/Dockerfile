@@ -18,7 +18,6 @@ RUN chown -R nobody.nobody \
     /var/lib/nginx \
     /var/log/nginx
 
-
 USER nobody
 
 EXPOSE 8080

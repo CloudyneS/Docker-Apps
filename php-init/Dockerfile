@@ -1,6 +1,6 @@
 ARG ALPINE_VERSION=3.17
 ARG PHP_VERSION=8.1
-ARG INIT_PACKAGES='nano bash net-tools wget zip tar curl git rsync p7zip python3 py3-pip py3-setuptools'
+ARG INIT_PACKAGES='sudo nano bash net-tools wget zip tar curl git rsync p7zip python3 py3-pip py3-setuptools'
 FROM ghcr.io/cloudynes/php-base:fpm${PHP_VERSION}-alpine${ALPINE_VERSION}
 
 LABEL Maintainer="Cloudyne Systems"
@@ -29,15 +29,13 @@ RUN cd /init-py && \
     pip3 install -r requirements.txt && \
     mkdir -p /etc/composer && \
     chown -R nobody.nobody /etc/composer /init-py /app && \
-    chmod -R 777 /etc/composer
+    chmod -R 700 /etc/composer
 
 COPY --chown=nobody composer-config.json /etc/composer/config.json
-# COPY composer-config.json /etc/composer/config.json
 
 ENV COMPOSER_HOME=/etc/composer
-# ENV COMPOSER_ALLOW_SUPERUSER=1
 
-USER nobody
+# USER nobody
 
 ENTRYPOINT [ "python3" ]
 CMD [ "/init-py/init.py" ]

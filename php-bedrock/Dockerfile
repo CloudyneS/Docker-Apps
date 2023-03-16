@@ -10,6 +10,7 @@ LABEL Version="1.0"
 USER root
 RUN mkdir -p /etc/composer && chown nobody.nobody /etc/composer
 # COPY --chown=nobody composer-config.json /etc/composer/config.json
+
 COPY composer-config.json /etc/composer/config.json
 USER nobody
 

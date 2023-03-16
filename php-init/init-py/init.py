@@ -112,14 +112,17 @@ if __name__ == '__main__':
     pr.ok("Moving data to persistent volume...")
     syncFolders('/tmp/app/web/app/', '/app/web/app/', True, ['uploads', 'plugins'])
 
+    pr.ok("Setting permissions...")
+    runCommand('chown -R nobody:root /app || true')
+
     pr.ok('Finished files, checking database...')
     if envv.get('IMPORT_DATABASE', False):
-        if not runCommand('cd /app && wp core is-installed', b''):
+        if not runCommand('cd /app && wp --allow-root core is-installed', b''):
             pr.info('Database is not installed')
             pr.info('Retrieving from ' + envv['IMPORT_DATABASE'])
             sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
             
-            if not runCommand(f'cd /app && ls -al && wp db import {sql_file} && mv {sql_file} /backup/current.sql', b'Success'):
+            if not runCommand(f'cd /app && ls -al && wp --allow-root db import {sql_file} && mv {sql_file} /backup/current.sql', b'Success'):
                 pr.err('Error importing database')
                 runCommand(f'cp -f {sql_file} /backup/current.sql && cp -f {sql_file} /app/import.sql')
                 exit(1)
@@ -127,7 +130,7 @@ if __name__ == '__main__':
     pr.ok("Finished database, setting theme...")
     if envv.get('SET_THEME', False):
         pr.info("Setting theme to " + envv['SET_THEME'])
-        runCommand(f'cd /app && wp theme activate {envv["SET_THEME"]}', b'')
+        runCommand(f'cd /app && wp --allow-root theme activate {envv["SET_THEME"]}', b'')
     
     pr.ok("Success!")
 
