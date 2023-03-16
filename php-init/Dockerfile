@@ -37,5 +37,7 @@ ENV COMPOSER_HOME=/etc/composer
 
 # USER nobody
 
-ENTRYPOINT [ "python3" ]
-CMD [ "/init-py/init.py" ]
+ENTRYPOINT [ "/app" ]
+CMD [ "/bin/bash", "/init-py/init.sh" ]
+# ENTRYPOINT [ "python3" ]
+# CMD [ "/init-py/init.py" ]
