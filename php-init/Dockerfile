@@ -28,16 +28,13 @@ ADD init-py /init-py
     # Create folders for composer and wp-cli
 RUN mkdir -p                /etc/composer                                                                       \
                             /etc/wpcli/packages &&                                                              \
-                                                                                                                \
+
     # Install composer
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&    \
-                                                                                                                \
-    # Install WP-CLI
-    curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar &&      \
-                                                                                                                \
+
     # Install requirements for init script
     pip3 install -r /init-py/requirements.txt &&                                                                \
-                                                                                                                \
+
     # Change ownership to nobody user for composer and wp-cli
     # since init script is run as nobody
     chown -R nobody.root    /etc/composer                                                                        \
@@ -47,16 +44,10 @@ RUN mkdir -p                /etc/composer                                       
     # Change modes
     chmod -R 770            /etc/composer                                                                        \
                             /etc/wpcli                                                                           \
-                            /init-py &&                                                                          \
+                            /init-py &&                                                                          \                                                         \
 
-    # Set wp-cli as executable
-    chmod +x                /usr/local/bin/wp &&                                                                 \
-                                                                                                                 \
     # Install wp-cli-dotenv for the nobody user
-    sudo -u nobody -E /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command &&                     \
-                                                                                                                 \
-    # Print information about the installed wp-cli version
-    wp --info
+    sudo -u nobody -E /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command 
 
 # Add custom repository configuration
 COPY --chown=nobody composer-config.json /etc/composer/config.json

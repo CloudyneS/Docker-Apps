@@ -37,6 +37,15 @@ RUN docker-php-ext-install -j$(nproc) \
     zip \
     bcmath
 
+# Install WP-CLI
+RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    
+    # Set wp-cli as executable
+    chmod +x                /usr/local/bin/wp && \
+
+    # Print information about the installed wp-cli version
+    wp --info
+
 # Overwrite FPM Pool
 COPY www.conf /usr/local/etc/php-fpm.d/www.conf
 
