@@ -17,12 +17,6 @@ RUN apk add --no-cache ${INIT_PACKAGES}
 # Add composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; 
 
-# Add WP-CLI and wp-cli-dotenv-command
-RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
-    chmod +x /usr/local/bin/wp && \
-    wp --allow-root package install aaemnnosttv/wp-cli-dotenv-command && \
-    wp --info 
-
 # Switch back to nobody
 ADD init-py /init-py
 
@@ -31,6 +25,13 @@ RUN cd /init-py && \
     mkdir -p /etc/composer && \
     chown -R nobody.nobody /etc/composer /init-py /app && \
     chmod -R 700 /etc/composer
+
+# Add WP-CLI and wp-cli-dotenv-command
+RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
+    chmod +x /usr/local/bin/wp && \
+    export COMPOSER_HOME=/etc/composer && \
+    sudo -u nobody -E /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command && \
+    wp --info 
 
 COPY --chown=nobody composer-config.json /etc/composer/config.json
 
