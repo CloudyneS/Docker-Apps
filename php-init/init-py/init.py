@@ -92,7 +92,7 @@ if __name__ == '__main__':
     if isConsideredTrue(envv.get('RUN_COMPOSER', False)):
         # Always get newest version of roots/bedrock
         if not runCommand(
-            'composer create-project roots/bedrock --no-dev --no-interaction /tmp/app', b'No security vulnerability advisories found'
+            'composer create-project roots/bedrock --no-dev --no-interaction --no-audit /tmp/app', b'Generating optimized autoload'
         ):
             pr.err("Could not create project")
             exit(1)
@@ -102,7 +102,7 @@ if __name__ == '__main__':
         if isConsideredTrue(envv.get('INSTALL_SITE', False)):
             pr.info("Installing site from " + envv['INSTALL_SITE'])
             if not runCommand(
-                f'cd /tmp/app && composer require {envv["INSTALL_SITE"]} --no-interaction', b'No security vulnerability advisories found'
+                f'cd /tmp/app && composer require {envv["INSTALL_SITE"]} --no-interaction', b'Generating optimized autoload'
             ):
                 pr.err("Could not install site")
                 exit(1)

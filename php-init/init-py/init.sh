@@ -1,7 +1,7 @@
 set -e && \
+export COMPOSER_HOME="/etc/composer" && \
 mkdir /tmp/app && \
 echo "Starting to chown..." && \
-env && \
 chown -R nobody:root /app /tmp/app || true && \
 chmod -R 770 /tmp/app && \
 echo "Finished chown!" && \
