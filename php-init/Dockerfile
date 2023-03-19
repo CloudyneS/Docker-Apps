@@ -7,39 +7,60 @@ LABEL Maintainer="Cloudyne Systems"
 LABEL Description="Lightweight PHP-FPM init container for Kubernetes based on Alpine Linux."
 LABEL Version="1.0"
 
+# Initializations will be done using the root user
+# for the ability to chown folders, files and shares
 USER root
 
-# Install packages
+# Set environment variables
+ENV PYTHONUNBUFFERED=1                              \
+    COMPOSER_HOME="/etc/composer"                   \
+    WP_CLI_CACHE_DIR="/tmp/wpcli-cache"             \
+    WP_CLI_CONFIG_PATH="/etc/wpcli/wpcli.conf"      \
+    WP_CLI_PACKAGES_DIR="/etc/wpcli/packages"
+
+# Install additional packages for init
 ARG INIT_PACKAGES
-ENV PYTHONUNBUFFERED=1
 RUN apk add --no-cache ${INIT_PACKAGES}
 
-# Add composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; 
-
-# Switch back to nobody
+# Add the initialization scripts
 ADD init-py /init-py
 
-RUN cd /init-py && \
-    pip3 install -r requirements.txt && \
-    mkdir -p /etc/composer && \
-    chown -R nobody.nobody /etc/composer /init-py /app && \
-    chmod -R 700 /etc/composer
+    # Create folders for composer and wp-cli
+RUN mkdir -p                /etc/composer                                                                       \
+                            /etc/wpcli/packages &&                                                              \
+                                                                                                                \
+    # Install composer
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&    \
+                                                                                                                \
+    # Install WP-CLI
+    curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar &&      \
+                                                                                                                \
+    # Install requirements for init script
+    pip3 install -r /init-py/requirements.txt &&                                                                \
+                                                                                                                \
+    # Change ownership to nobody user for composer and wp-cli
+    # since init script is run as nobody
+    chown -R nobody.root    /etc/composer                                                                        \
+                            /etc/wpcli                                                                           \
+                            /init-py &&                                                                          \
+    
+    # Change modes
+    chmod -R 770            /etc/composer                                                                        \
+                            /etc/wpcli                                                                           \
+                            /init-py &&                                                                          \
 
-# Add WP-CLI and wp-cli-dotenv-command
-RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
-    chmod +x /usr/local/bin/wp && \
-    export COMPOSER_HOME=/etc/composer && \
-    sudo -u nobody -E /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command && \
-    wp --info 
+    # Set wp-cli as executable
+    chmod +x                /usr/local/bin/wp &&                                                                 \
+                                                                                                                 \
+    # Install wp-cli-dotenv for the nobody user
+    sudo -u nobody -E /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command &&                     \
+                                                                                                                 \
+    # Print information about the installed wp-cli version
+    wp --info
 
+# Add custom repository configuration
 COPY --chown=nobody composer-config.json /etc/composer/config.json
 
-ENV COMPOSER_HOME=/etc/composer
-
-# USER nobody
-
 ENTRYPOINT [ "" ]
+
 CMD [ "/bin/bash", "/init-py/init.sh" ]
-# ENTRYPOINT [ "python3" ]
-# CMD [ "/init-py/init.py" ]

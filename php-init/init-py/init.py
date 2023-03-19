@@ -9,8 +9,8 @@ def runCommand(command: str, expectedOutput: bytes = b'') -> bool:
         output = cmd.communicate()
         pr.info("Shell command: " + command)
         pr.info("Output: " + b','.join(output).decode('utf-8'))
-
-        return expectedOutput in output[1] and cmd.returncode == 0
+        pr.info("End Output")
+        return expectedOutput in b''.join(output) and cmd.returncode == 0
 
 def downloadFile(url: str, folder: str) -> str:
     pr.info("Downloading file from " + url)
@@ -126,7 +126,7 @@ if __name__ == '__main__':
         pr.ok("Importing database if not already installed...")
         sql_file = ""
         
-        if not runCommand('cd /app && wp --allow-root core is-installed', b''):
+        if not runCommand('cd /app && wp core is-installed', b''):
             pr.info("Database is not installed, retrieving and installing...")
             sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
         
@@ -143,14 +143,14 @@ if __name__ == '__main__':
 
 
         if sql_file != "":
-            if not runCommand(f'cd /app && wp --allow-root db import {sql_file}', b'Success'):
+            if not runCommand(f'cd /app && wp db import {sql_file}', b'Success'):
                 pr.err('Error importing database')
                 exit(1)
 
     if isConsideredTrue(envv.get('SET_THEME', False)):
         pr.info("Ensuring that theme is set correctly...")
         runCommand(
-            f'cd /app && wp --allow-root theme activate {envv["SET_THEME"]}', b''
+            f'cd /app && wp theme activate {envv["SET_THEME"]}', b''
         )
 
     # Always recreate the environment file
