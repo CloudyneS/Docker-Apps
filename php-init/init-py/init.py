@@ -156,6 +156,5 @@ if __name__ == '__main__':
     # Always recreate the environment file
     runCommand( 'cd /app && wp dotenv salts generate --force', b'' )
 
-
     pr.ok("Successfully finished importing site!")
 
