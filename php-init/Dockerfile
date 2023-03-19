@@ -17,9 +17,10 @@ RUN apk add --no-cache ${INIT_PACKAGES}
 # Add composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; 
 
-# Add WP-CLI
+# Add WP-CLI and wp-cli-dotenv-command
 RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x /usr/local/bin/wp && \
+    wp --allow-root package install aaemnnosttv/wp-cli-dotenv-command && \
     wp --info 
 
 # Switch back to nobody

@@ -95,8 +95,8 @@ if __name__ == '__main__':
             'composer create-project roots/bedrock --no-dev --no-interaction /tmp/app', b'No security vulnerability advisories found'
         ):
             pr.err("Could not create project")
-            exit(1)   
-    
+            exit(1)
+        
         # Download and install newest version of site
         pr.ok("Project created, installing site")
         if isConsideredTrue(envv.get('INSTALL_SITE', False)):
@@ -152,6 +152,10 @@ if __name__ == '__main__':
         runCommand(
             f'cd /app && wp --allow-root theme activate {envv["SET_THEME"]}', b''
         )
-    
+
+    # Always recreate the environment file
+    runCommand( 'cd /app && wp dotenv salts generate --force', b'' )
+
+
     pr.ok("Successfully finished importing site!")
 
