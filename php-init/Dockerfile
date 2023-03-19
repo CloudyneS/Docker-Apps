@@ -25,29 +25,12 @@ RUN apk add --no-cache ${INIT_PACKAGES}
 # Add the initialization scripts
 ADD init-py /init-py
 
-    # Create folders for composer and wp-cli
-RUN mkdir -p                /etc/composer                                                                       \
-                            /etc/wpcli/packages &&                                                              \
-
-    # Install composer
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&    \
-
-    # Install requirements for init script
-    pip3 install -r /init-py/requirements.txt &&                                                                \
-
-    # Change ownership to nobody user for composer and wp-cli
-    # since init script is run as nobody
-    chown -R nobody.root    /etc/composer                                                                        \
-                            /etc/wpcli                                                                           \
-                            /init-py &&                                                                          \
-    
-    # Change modes
-    chmod -R 770            /etc/composer                                                                        \
-                            /etc/wpcli                                                                           \
-                            /init-py &&                                                                          \                                                         \
-
-    # Install wp-cli-dotenv for the nobody user
-    sudo -u nobody -E /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command 
+RUN mkdir -p /etc/composer /etc/wpcli/packages && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    pip3 install -r /init-py/requirements.txt && \
+    chown -R nobody.root /etc/composer /etc/wpcli /init-py && \
+    chmod -R 770 /etc/composer /etc/wpcli /init-py && \
+    sudo -u nobody -E /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command
 
 # Add custom repository configuration
 COPY --chown=nobody composer-config.json /etc/composer/config.json
