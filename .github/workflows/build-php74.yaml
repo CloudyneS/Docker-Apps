@@ -40,11 +40,8 @@ jobs:
             PHP_VERSION=7.4
             ALPINE_VERSION=3.16
           tags: |
-            ghcr.io/cloudynes/php-base:latest
-            ghcr.io/cloudynes/php-base:fpm-alpine
             ghcr.io/cloudynes/php-base:fpm7.4-alpine3.16
             ghcr.io/cloudynes/php-base:fpm7.4-alpine
-            ghcr.io/cloudynes/php-base:fpm-alpine3.16
 
       - name: Build and push nginx image (nginx:1.21.3-alpine)
         uses: docker/build-push-action@v2
@@ -58,11 +55,8 @@ jobs:
             PHP_VERSION=7.4
             ALPINE_VERSION=3.16
           tags: |
-            ghcr.io/cloudynes/php-nginx:latest
-            ghcr.io/cloudynes/php-nginx:fpm-alpine
             ghcr.io/cloudynes/php-nginx:fpm7.4-alpine3.16
             ghcr.io/cloudynes/php-nginx:fpm7.4-alpine
-            ghcr.io/cloudynes/php-nginx:fpm-alpine3.16
 
       - name: Build and push init image
         uses: docker/build-push-action@v2
@@ -76,8 +70,5 @@ jobs:
             PHP_VERSION=7.4
             ALPINE_VERSION=3.16
           tags: |
-            ghcr.io/cloudynes/php-init:latest
-            ghcr.io/cloudynes/php-init:fpm-alpine
             ghcr.io/cloudynes/php-init:fpm7.4-alpine3.16
             ghcr.io/cloudynes/php-init:fpm7.4-alpine
-            ghcr.io/cloudynes/php-init:fpm-alpine3.16
