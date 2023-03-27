@@ -7,13 +7,16 @@
         },
         {
             "type": "composer",
-            "url": "https://buildahome.repo.pkg.clo.bz",
-            "only": [ "buildahome/*" ]
+            "url": "https://git.cloudyne.net/api/v4/group/26/-/packages/composer/packages.json",
+            "only": ["buildahome/*"]
         },
         {
             "type": "composer",
-            "url": "https://cloudyne.repo.pkg.clo.bz",
-            "only": [ "cloudyne/*" ]
+            "url": "https://git.cloudyne.net/api/v4/group/49/-/packages/composer/packages.json",
+            "only": ["cloudyne/*"]
         }
-    ]
+    ],
+    "config": {
+        "gitlab-domains": ["git.cloudyne.net"]
+    }
 }
