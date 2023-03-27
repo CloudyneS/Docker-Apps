@@ -128,7 +128,11 @@ if __name__ == '__main__':
         
         if not runCommand('cd /app && wp core is-installed', b''):
             pr.info("Database is not installed, retrieving and installing...")
-            sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
+            try:
+                sql_file = downloadFile(envv['IMPORT_DATABASE'], '/tmp')
+            except:
+                pr.info("Could not download database, testing if it is a path ...")
+                sql_file = envv['IMPORT_DATABASE']
         
         elif isConsideredTrue(envv.get('FORCE_IMPORT_DB', False)):
             pr.err("Database is already installed, but FORCE_IMPORT_DB is set so database will be replaced")
@@ -140,7 +144,6 @@ if __name__ == '__main__':
             ):
                 pr.err('Could not reset database, skipping import...')
                 sql_file = ""
-
 
         if sql_file != "":
             if not runCommand(f'cd /app && wp db import {sql_file}', b'Success'):
