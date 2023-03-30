@@ -1,0 +1,22 @@
+services:
+  database:
+    image: mysql:5.7
+    ports:
+      - 3333:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+  app:
+    container_name: phpapp
+    image: cloudyne/php-unit-bedrock:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - database
+    environment:
+      DATABASE_URL: "mysql://wordpress:wordpress@database/wordpress"
+    ports:
+      - 8000:8080

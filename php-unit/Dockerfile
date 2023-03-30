@@ -1,6 +1,6 @@
-ARG PHP_VERSION=8.1
+ARG SOURCE_TAG=1.29.1-php8.1
 # FROM php:${PHP_VERSION}-cli-alpine
-FROM nginx/unit:1.29.1-php${PHP_VERSION}
+FROM nginx/unit:${SOURCE_TAG}
 
 LABEL Maintainer="Cloudyne Systems"
 LABEL Description="Nginx Unit and PHP image"

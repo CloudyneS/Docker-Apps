@@ -5,6 +5,11 @@ PHP containers built for Kubernetes
 - [ ] Add support and images for PHP8.1
 - [ ] Add support and images for PHP7.4
 - [ ] Google tag manager plugin
+### Unit Todo
+- Build with follow_symlinks option
+- Index not working
+
+
 
 ## Sendmail Configuration
 Environment variables:

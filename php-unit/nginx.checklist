@@ -1,55 +1,55 @@
-worker_processes auto;
-error_log stderr warn;
-pid /run/nginx/nginx.pid;
+#worker_processes auto;
+#error_log stderr warn;
+#pid /run/nginx/nginx.pid;
 
-events {
-    worker_connections 1024;
-}
+#events {
+#    worker_connections 1024;
+#}
 
-http {
+#http {
     # Include mime types to be served by the webserver and set the default type
-    include mime.types;
-    default_type application/octet-stream;
+    # include mime.types;
+    # default_type application/octet-stream;
 
     # Enable symlinks
-    disable_symlinks off;
+    # disable_symlinks off;
 
     # Define a custom log format to include upstream response time
-    log_format main_timed '$remote_addr - $remote_user [$time_local] "$request" '
-                          '$status $body_bytes_sent "$http_referer" '
-                          '"$http_user_agent" "$http_x_forwarded_for" '
-                          '$request_time $upstream_response_time $pipe $upstream_cache_status';
+    # log_format main_timed '$remote_addr - $remote_user [$time_local] "$request" '
+    #                      '$status $body_bytes_sent "$http_referer" '
+    #                      '"$http_user_agent" "$http_x_forwarded_for" '
+    #                      '$request_time $upstream_response_time $pipe $upstream_cache_status';
 
     # Send all logs to docker stdout/stderr
-    access_log /dev/stdout main_timed;
-    error_log /dev/stderr notice;
+    # access_log /dev/stdout main_timed;
+    # error_log /dev/stderr notice;
 
     # Set the keepalive timeout for connections
-    keepalive_timeout 61;
+    # keepalive_timeout 61;
 
     # Write temporary files to /tmp so they can be created as a non-privileged user
-    client_body_temp_path /tmp/client_temp;
-    proxy_temp_path /tmp/proxy_temp_path;
-    fastcgi_temp_path /tmp/fastcgi_temp;
-    uwsgi_temp_path /tmp/uwsgi_temp;
-    scgi_temp_path /tmp/scgi_temp;
+    # client_body_temp_path /tmp/client_temp;
+    #proxy_temp_path /tmp/proxy_temp_path;
+    #fastcgi_temp_path /tmp/fastcgi_temp;
+    #uwsgi_temp_path /tmp/uwsgi_temp;
+    #scgi_temp_path /tmp/scgi_temp;
 
     # Define the listener for the default server
     server {
-        listen [::]:8080 default_server;
-        listen 8080 default_server;
-        server_name _;
+        #listen [::]:8080 default_server;
+        #listen 8080 default_server;
+        #server_name _;
         
         # Serve static files via buffer instead of directly to stream
-        sendfile off;
-        tcp_nodelay on;
+        #sendfile off;
+        #tcp_nodelay on;
 
         # Disable absolute redirects 
-        absolute_redirect off;
+        # absolute_redirect off;
 
         # Define application root and index files
-        root /app/web;
-        index index.php index.html index.htm;
+        # root /app/web;
+        # index index.php index.html index.htm;
 
         # Before serving PHP, ensure that there are no static files or folders present at the given location
         location / {
@@ -64,19 +64,19 @@ http {
         }
 
         # Prevent PHP scripts from being executed inside the uploads folder.
-        location ~* /wp-content/uploads/.*.php$ {
-            deny all;
-        }
+        #location ~* /wp-content/uploads/.*.php$ {
+        #    deny all;
+        #}
 
         # Set error page for 50x errors to the Nginx default
         # then, specify the root folder for the error page
-        error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
-            root /var/lib/nginx/html;
-        }
+        #error_page 500 502 503 504 /50x.html;
+        #location = /50x.html {
+        #    root /var/lib/nginx/html;
+       # }
 
         # If no static files are found, serve the PHP application
-        location ~ \.php$ {
+        # location ~ \.php$ {
             fastcgi_buffer_size 128k;
             fastcgi_buffers 4 256k;
             fastcgi_busy_buffers_size 256k;
