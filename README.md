@@ -1,10 +1,21 @@
+# Docker Applications
+A collection of docker images for various applications and services.
+
+## PHP Images
+### php:\*.\*-alpine\*.\*\*-embed
+PHP Images built with the --allow-embed option for use with Nginx Unit
+
+### php:\*.\*-alpine\*.\*\*
+The embed image from above with additional extensions installed for use with unit and Wordpress
+
+### ghcr.io/cloudynes/php-unit:\*.\*-\*.\*.\*\*-unit\*.\*\*.\*
+Alpine image with Nginx Unit based on the cloudyne/php-images
+
+### php
+PHP Images with the following extensions added:
 # php-apps
 PHP containers built for Kubernetes
 
-## Todo
-- [ ] Add support and images for PHP8.1
-- [ ] Add support and images for PHP7.4
-- [ ] Google tag manager plugin
 ### Unit Todo
 - Build with follow_symlinks option
 - Index not working

@@ -2,3 +2,5 @@ tests*
 tests/*
 testfiles
 test-*/
+unit/
+unit-repo/
