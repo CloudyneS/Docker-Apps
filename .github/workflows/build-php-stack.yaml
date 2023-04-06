@@ -47,7 +47,7 @@ jobs:
         file: ./php-l1-base/Dockerfile
         push: true
         build-args: |
-            PHP_VERSION=${{ matrix.php }}
+            SOURCE_VERSION=${{ matrix.php }}
         tags: |
             ghcr.io/cloudynes/php-base:${{ matrix.php }}
             ghcr.io/cloudynes/php-base:${{ matrix.php }}
@@ -63,7 +63,7 @@ jobs:
         file: ./php-l2-unit/Dockerfile
         push: true
         build-args: |
-            PHP_VERSION=${{ matrix.php }}
+            SOURCE_VERSION=${{ matrix.php }}
         tags: |
             ghcr.io/cloudynes/php-unit:${{ matrix.php }}
             ghcr.io/cloudynes/php-unit:${{ matrix.php }}
@@ -79,7 +79,7 @@ jobs:
         file: ./php-l3-bedrock/Dockerfile
         push: true
         build-args: |
-            PHP_VERSION=${{ matrix.php }}
+            SOURCE_VERSION=${{ matrix.php }}
         tags: |
             ghcr.io/cloudynes/php-bedrock:${{ matrix.php }}
             ghcr.io/cloudynes/php-bedrock:${{ matrix.php }}
@@ -95,7 +95,7 @@ jobs:
         file: ./php-l3-cd/Dockerfile
         push: true
         build-args: |
-            PHP_VERSION=${{ matrix.php }}
+            SOURCE_VERSION=${{ matrix.php }}
         tags: |
             ghcr.io/cloudynes/php-cd:${{ matrix.php }}
             ghcr.io/cloudynes/php-cd:${{ matrix.php }}
