@@ -7,7 +7,7 @@ on:
       - 'unit'
 
 jobs:
-  builds:
+  php-unit-builds:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -36,11 +36,25 @@ jobs:
     - name: List files
       run: ls -la
 
+    - name: Build and push php-unit 7.4
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        context: ./unit/php
+        file: ./unit/php/7.4/Dockerfile
+        push: true
+        tags: |
+            ghcr.io/cloudynes/php-unit:7.4
+            ghcr.io/cloudynes/php-unit:7
+            cloudyne/php-unit:7.4
+            cloudyne/php-unit:7
+
     - name: Build and push bedrock 7.4
       uses: docker/build-push-action@v2
       with:
-        cache-from: type=registry,ref=ghcr.io/cloudynes/php-base:cache
-        cache-to: type=registry,ref=ghcr.io/cloudynes/php-base:cache
+        cache-from: type=registry,ref=ghcr.io/cloudynes/bedrock:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/bedrock:cache
         context: ./bedrock
         file: ./bedrock/7.4/Dockerfile
         push: true
@@ -50,11 +64,23 @@ jobs:
             cloudyne/bedrock:7.4
             cloudyne/bedrock:7
         
+    - name: Build and push php-unit 8.0
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        context: ./php/unit
+        file: ./php/unit/8.0/Dockerfile
+        push: true
+        tags: |
+            ghcr.io/cloudynes/php-unit:8.0
+            cloudyne/php-unit:8.0
+
     - name: Build and push bedrock 8.0
       uses: docker/build-push-action@v2
       with:
-        cache-from: type=registry,ref=ghcr.io/cloudynes/php-base:cache
-        cache-to: type=registry,ref=ghcr.io/cloudynes/php-base:cache
+        cache-from: type=registry,ref=ghcr.io/cloudynes/bedrock:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/bedrock:cache
         context: ./bedrock
         file: ./bedrock/8.0/Dockerfile
         push: true
@@ -63,11 +89,23 @@ jobs:
             cloudyne/bedrock:8.0
 
 
+    - name: Build and push php-unit 8.1
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        context: ./php/unit
+        file: ./php/unit/8.1/Dockerfile
+        push: true
+        tags: |
+            ghcr.io/cloudynes/php-unit:8.1
+            cloudyne/php-unit:8.1
+
     - name: Build and push bedrock 8.1
       uses: docker/build-push-action@v2
       with:
-        cache-from: type=registry,ref=ghcr.io/cloudynes/php-base:cache
-        cache-to: type=registry,ref=ghcr.io/cloudynes/php-base:cache
+        cache-from: type=registry,ref=ghcr.io/cloudynes/bedrock:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/bedrock:cache
         context: ./bedrock
         file: ./bedrock/8.1/Dockerfile
         push: true
@@ -75,6 +113,22 @@ jobs:
             ghcr.io/cloudynes/bedrock:8.1
             cloudyne/bedrock:8.1
 
+
+    - name: Build and push php-unit 8.2
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        context: ./php/unit
+        file: ./php/unit/8.2/Dockerfile
+        push: true
+        tags: |
+            ghcr.io/cloudynes/php-unit:8.2
+            ghcr.io/cloudynes/php-unit:8
+            ghcr.io/cloudynes/php-unit:latest
+            cloudyne/php-unit:8.2
+            cloudyne/php-unit:8
+            cloudyne/php-unit:latest
 
     - name: Build and push bedrock 8.2
       uses: docker/build-push-action@v2
