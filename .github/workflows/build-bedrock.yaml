@@ -69,8 +69,8 @@ jobs:
       with:
         cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
         cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
-        context: ./php/unit
-        file: ./php/unit/8.0/Dockerfile
+        context: ./unit/php
+        file: ./unit/php/8.0/Dockerfile
         push: true
         tags: |
             ghcr.io/cloudynes/php-unit:8.0
@@ -94,8 +94,8 @@ jobs:
       with:
         cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
         cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
-        context: ./php/unit
-        file: ./php/unit/8.1/Dockerfile
+        context: ./unit/php
+        file: ./unit/php/8.1/Dockerfile
         push: true
         tags: |
             ghcr.io/cloudynes/php-unit:8.1
@@ -119,8 +119,8 @@ jobs:
       with:
         cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
         cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
-        context: ./php/unit
-        file: ./php/unit/8.2/Dockerfile
+        context: ./unit/php
+        file: ./unit/php/8.2/Dockerfile
         push: true
         tags: |
             ghcr.io/cloudynes/php-unit:8.2
