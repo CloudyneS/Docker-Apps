@@ -2,5 +2,8 @@ tests*
 tests/*
 testfiles
 test-*/
-unit/
 unit-repo/
+xold
+xphp
+xunit
+xunit-repo

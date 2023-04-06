@@ -1,20 +1,44 @@
 # Docker Applications
 A collection of docker images for various applications and services.
 
+# Todo
+- Install sendmail?
+
+
+
 ## PHP Images
-### php:\*.\*-alpine\*.\*\*-embed
-PHP Images built with the --allow-embed option for use with Nginx Unit
+### alpine/php-embed (Alpha)
+Recompiled Alpine PHP images with the --allow-embed option set to be able to compile Nginx Unit.
+Tags:
+- php-embed:7.4-alpine3.16
+- php-embed:8.0-alpine3.16 (stable)
+- php-embed:8.1-alpine3.17
+- php-embed:8.2-alpine3.17 (latest)
 
-### php:\*.\*-alpine\*.\*\*
-The embed image from above with additional extensions installed for use with unit and Wordpress
+### alpine/php-extended (Alpha)
+Based on php-embed with additional extensions for use with unit and Wordpress
+Tags:
+- php-extended:7.4-alpine3.16
+- php-extended:8.0-alpine3.16 (stable)
+- php-extended:8.1-alpine3.17
+- php-extended:8.2-alpine3.17 (latest)
 
-### ghcr.io/cloudynes/php-unit:\*.\*-\*.\*.\*\*-unit\*.\*\*.\*
-Alpine image with Nginx Unit based on the cloudyne/php-images
+### alpine/php-unit (Alpha)
+Based on php-extended and nginx/unit
+Tags:
+- php-unit:7.4-unit1.29.0
+- php-unit:8.0-unit1.29.1 (stable)
+- php-unit:8.1-unit1.29.1
+- php-unit:8.2-unit1.29.1 (latest)
 
-### php
-PHP Images with the following extensions added:
-# php-apps
-PHP containers built for Kubernetes
+### debian/php-unit (Stable)
+Based on the official php:*-bullseye images with additional extensions for use with unit and Wordpress
+Tags:
+- php-slim:7.4-slim-bullseye
+- php-slim:8.0-slim-bullseye (stable)
+- php-slim:8.1-slim-bullseye
+- php-slim:8.2-slim-bullseye (latest)
+
 
 ### Unit Todo
 - Build with follow_symlinks option
