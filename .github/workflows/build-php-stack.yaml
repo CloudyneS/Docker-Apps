@@ -1,0 +1,103 @@
+name: build
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'unit'
+
+jobs:
+  php-builds:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: [ '7.4', '8.0', '8.1', '8.2' ]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to GHCR
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: cloudynes
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        registry: docker.io
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    
+    - name: Build and push php-base
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-base:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-base:cache
+        context: ./php-l1-base
+        file: ./php-l1-base/Dockerfile
+        push: true
+        build-args: |
+            PHP_VERSION=${{ matrix.php }}
+        tags: |
+            ghcr.io/cloudynes/php-base:${{ matrix.php }}
+            ghcr.io/cloudynes/php-base:${{ matrix.php }}
+            cloudyne/php-base:${{ matrix.php }}
+            cloudyne/php-base:${{ matrix.php }}
+
+    - name: Build and push php-unit
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-unit:cache
+        context: ./php-l2-unit
+        file: ./php-l2-unit/Dockerfile
+        push: true
+        build-args: |
+            PHP_VERSION=${{ matrix.php }}
+        tags: |
+            ghcr.io/cloudynes/php-unit:${{ matrix.php }}
+            ghcr.io/cloudynes/php-unit:${{ matrix.php }}
+            cloudyne/php-unit:${{ matrix.php }}
+            cloudyne/php-unit:${{ matrix.php }}
+    
+    - name: Build and push php-bedrock
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-bedrock:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-bedrock:cache
+        context: ./php-l3-bedrock
+        file: ./php-l3-bedrock/Dockerfile
+        push: true
+        build-args: |
+            PHP_VERSION=${{ matrix.php }}
+        tags: |
+            ghcr.io/cloudynes/php-bedrock:${{ matrix.php }}
+            ghcr.io/cloudynes/php-bedrock:${{ matrix.php }}
+            cloudyne/php-bedrock:${{ matrix.php }}
+            cloudyne/php-bedrock:${{ matrix.php }}
+    
+    - name: Build and push php-cd
+      uses: docker/build-push-action@v2
+      with:
+        cache-from: type=registry,ref=ghcr.io/cloudynes/php-cd:cache
+        cache-to: type=registry,ref=ghcr.io/cloudynes/php-cd:cache
+        context: ./php-l3-cd
+        file: ./php-l3-cd/Dockerfile
+        push: true
+        build-args: |
+            PHP_VERSION=${{ matrix.php }}
+        tags: |
+            ghcr.io/cloudynes/php-cd:${{ matrix.php }}
+            ghcr.io/cloudynes/php-cd:${{ matrix.php }}
+            cloudyne/php-cd:${{ matrix.php }}
+            cloudyne/php-cd:${{ matrix.php }}

@@ -1,6 +1,12 @@
-FROM php:8.2-cli as BUILDER
+ARG SOURCE_VERSION=8.2
+FROM ghcr.io/cloudynes/php-base:${SOURCE_VERSION} as BUILDER
 
-LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
+LABEL Version="1.0"
+LABEL Maintainer="Cloudyne Systems"
+LABEL org.opencontainers.image.source="https://github.com/cloudynes/docker-apps"
+LABEL Description="PHP and Nginx Unit container for Kubernetes deployment"
+LABEL org.opencontainers.image.description="PHP and Nginx Unit container for Kubernetes deployment"
+LABEL org.opencontainers.image.licenses="MIT"
 
 RUN set -ex \
     && apt-get update \
@@ -40,64 +46,14 @@ RUN set -ex \
     && make -j $NCPU php-install \
     && ldd /usr/sbin/unitd | awk '/=>/{print $(NF-1)}' | while read n; do dpkg-query -S $n; done | sed 's/^\([^:]\+\):.*$/\1/' | sort | uniq > /requirements.apt
 
-FROM php:8.2-cli
+FROM ghcr.io/cloudynes/php-base:${SOURCE_VERSION}
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY --from=BUILDER /usr/sbin/unitd /usr/sbin/unitd
 COPY --from=BUILDER /usr/sbin/unitd-debug /usr/sbin/unitd-debug
 COPY --from=BUILDER /usr/lib/unit/ /usr/lib/unit/
 COPY --from=BUILDER /requirements.apt /requirements.apt
+
 RUN ldconfig
-
-ENV PHPIZE_DEPS \
-    zlib1g-dev libfreetype6-dev \
-    curl libjpeg-dev \
-    libicu-dev libpng-dev \
-    libssl-dev libzip-dev \
-    default-libmysqlclient-dev \
-    libc-client-dev libkrb5-dev
-        
-RUN set -eux; \
-	\
-	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		$PHPIZE_DEPS \
-	; \
-	\
-    docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg; \
-	docker-php-ext-install -j "$(nproc)" \
-        gd \
-        intl \
-        pdo_mysql \
-        mysqli \
-        opcache \
-        imap \
-        zip \
-        bcmath \
-        ; \
-        \    
-    # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-	apt-mark auto '.*' > /dev/null; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
-	find /usr/local -type f -executable -exec ldd '{}' ';' \
-		| awk '/=>/ { print $(NF-1) }' \
-		| sort -u \
-		| xargs -r dpkg-query --search \
-		| cut -d: -f1 \
-		| sort -u \
-		| xargs -r apt-mark manual \
-	; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-# update pecl channel definitions https://github.com/docker-library/php/issues/443
-	pecl update-channels; \
-	rm -rf /tmp/pear ~/.pearrc; \
-	\
-# smoke test
-	php --version
-
 
 RUN set -x \
     && if [ -f "/tmp/libunit.a" ]; then \
@@ -108,19 +64,22 @@ RUN set -x \
     && mkdir /docker-entrypoint.d/ \
     && addgroup --system unit \
     && adduser \
-         --system \
-         --disabled-login \
-         --ingroup unit \
-         --no-create-home \
-         --home /nonexistent \
-         --gecos "unit user" \
-         --shell /bin/false \
-         unit \
+        --system \
+        --disabled-login \
+        --ingroup unit \
+        --no-create-home \
+        --home /nonexistent \
+        --gecos "unit user" \
+        --shell /bin/false \
+        unit \
     && apt update \
     && apt --no-install-recommends --no-install-suggests -y install curl $(cat /requirements.apt) \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && rm -f /requirements.apt \
-    && ln -sf /dev/stdout /var/log/unit.log
+    && ln -sf /dev/stdout /var/log/unit.log && \
+    mkdir -p /var/lib/unit && chown -R unit:unit /var/run /run /var/lib/unit
+
+USER unit
 
 STOPSIGNAL SIGTERM
 

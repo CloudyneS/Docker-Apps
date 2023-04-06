@@ -9,13 +9,13 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
-    volumes:
-      - ./mysql:/var/lib/mysql
   php74:
     image: ghcr.io/cloudynes/bedrock:7.4
     build:
       context: .
-      dockerfile: ./7.4/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SOURCE_VERSION: "7.4"
     ports:
       - 8080:8080
     depends_on:
@@ -24,6 +24,7 @@ services:
       DATABASE_URL: mysql://wordpress:wordpress@mysql:3306/wordpress
       WP_HOME: http://localhost:8080
       WP_SITEURL: http://localhost:8080/wp
+      WP_ENV: development
   # php80:
   #   image: ghcr.io/cloudynes/bedrock:8.0
   #   build:
