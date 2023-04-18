@@ -1,5 +1,5 @@
 ARG SOURCE_VERSION=8.2
-ARG INIT_PACKAGES='sudo nano bash net-tools wget zip tar curl git rsync p7zip python3 python3-pip python3-setuptools'
+ARG INIT_PACKAGES='sudo nano bash net-tools wget zip tar curl git rsync p7zip python3 python3-pip python3-setuptools mariadb-client'
 FROM ghcr.io/cloudynes/php-unit:${SOURCE_VERSION}
 
 LABEL Version="1.0"

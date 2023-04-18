@@ -1,5 +1,5 @@
 ARG SOURCE_VERSION=8.2
-FROM ghcr.io/cloudynes/php-base:${SOURCE_VERSION} as BUILDER
+FROM ghcr.io/cloudynes/php-extended:${SOURCE_VERSION} as BUILDER
 
 LABEL Version="1.0"
 LABEL Maintainer="Cloudyne Systems"
@@ -46,7 +46,7 @@ RUN set -ex \
     && make -j $NCPU php-install \
     && ldd /usr/sbin/unitd | awk '/=>/{print $(NF-1)}' | while read n; do dpkg-query -S $n; done | sed 's/^\([^:]\+\):.*$/\1/' | sort | uniq > /requirements.apt
 
-FROM ghcr.io/cloudynes/php-base:${SOURCE_VERSION}
+FROM ghcr.io/cloudynes/php-extended:${SOURCE_VERSION}
 COPY docker-entrypoint.sh /usr/local/bin/
 COPY --from=BUILDER /usr/sbin/unitd /usr/sbin/unitd
 COPY --from=BUILDER /usr/sbin/unitd-debug /usr/sbin/unitd-debug

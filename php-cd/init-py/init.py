@@ -152,9 +152,16 @@ if __name__ == '__main__':
 
     if isConsideredTrue(envv.get('SET_THEME', False)):
         pr.info("Ensuring that theme is set correctly...")
-        runCommand(
-            f'cd /app && wp theme activate {envv["SET_THEME"]}', b''
-        )
+        
+        if envv.get("FORCE_THEME_NAME", "") != "":
+            runCommand(
+                f'cd /app/web/app/themes && mv {envv["SET_THEME"]} {envv["FORCE_THEME_NAME"]} && wp theme activate {envv["FORCE_THEME_NAME"]}',
+                b''
+            )
+        else:
+            runCommand(
+                f'cd /app && wp theme activate {envv["SET_THEME"]}', b''
+            )
 
     # Always recreate the environment file
     runCommand( 'cd /app && wp dotenv salts generate --force', b'' )
