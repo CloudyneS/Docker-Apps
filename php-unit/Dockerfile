@@ -1,55 +1,88 @@
-ARG SOURCE_TAG=1.29.1-php8.1
-# FROM php:${PHP_VERSION}-cli-alpine
-FROM nginx/unit:${SOURCE_TAG}
+ARG SOURCE_VERSION=8.2
+FROM ghcr.io/cloudynes/php-extended:${SOURCE_VERSION} as BUILDER
 
-LABEL Maintainer="Cloudyne Systems"
-LABEL Description="Nginx Unit and PHP image"
 LABEL Version="1.0"
+LABEL Maintainer="Cloudyne Systems"
+LABEL org.opencontainers.image.source="https://github.com/cloudynes/docker-apps"
+LABEL Description="PHP and Nginx Unit container for Kubernetes deployment"
+LABEL org.opencontainers.image.description="PHP and Nginx Unit container for Kubernetes deployment"
+LABEL org.opencontainers.image.licenses="MIT"
 
-# Set the working directory
-RUN mkdir /app
-WORKDIR /app
+RUN set -ex \
+    && apt-get update \
+    && apt-get install --no-install-recommends --no-install-suggests -y ca-certificates mercurial build-essential libssl-dev libpcre2-dev \
+    && mkdir -p /usr/lib/unit/modules /usr/lib/unit/debug-modules \
+    && hg clone https://hg.nginx.org/unit \
+    && cd unit \
+    && hg up 1.29.1 \
+    && NCPU="$(getconf _NPROCESSORS_ONLN)" \
+    && DEB_HOST_MULTIARCH="$(dpkg-architecture -q DEB_HOST_MULTIARCH)" \
+    && CC_OPT="$(DEB_BUILD_MAINT_OPTIONS="hardening=+all,-pie" DEB_CFLAGS_MAINT_APPEND="-Wp,-D_FORTIFY_SOURCE=2 -fPIC" dpkg-buildflags --get CFLAGS)" \
+    && LD_OPT="$(DEB_BUILD_MAINT_OPTIONS="hardening=+all,-pie" DEB_LDFLAGS_MAINT_APPEND="-Wl,--as-needed -pie" dpkg-buildflags --get LDFLAGS)" \
+    && CONFIGURE_ARGS="--prefix=/usr \
+                --state=/var/lib/unit \
+                --control=unix:/var/run/control.unit.sock \
+                --pid=/var/run/unit.pid \
+                --log=/var/log/unit.log \
+                --tmp=/var/tmp \
+                --user=unit \
+                --group=unit \
+                --openssl \
+                --libdir=/usr/lib/$DEB_HOST_MULTIARCH" \
+    && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --ld-opt="$LD_OPT" --modules=/usr/lib/unit/debug-modules --debug \
+    && make -j $NCPU unitd \
+    && install -pm755 build/unitd /usr/sbin/unitd-debug \
+    && make clean \
+    && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --ld-opt="$LD_OPT" --modules=/usr/lib/unit/modules \
+    && make -j $NCPU unitd \
+    && install -pm755 build/unitd /usr/sbin/unitd \
+    && make clean \
+    && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --modules=/usr/lib/unit/debug-modules --debug \
+    && ./configure php \
+    && make -j $NCPU php-install \
+    && make clean \
+    && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --modules=/usr/lib/unit/modules \
+    && ./configure php \
+    && make -j $NCPU php-install \
+    && ldd /usr/sbin/unitd | awk '/=>/{print $(NF-1)}' | while read n; do dpkg-query -S $n; done | sed 's/^\([^:]\+\):.*$/\1/' | sort | uniq > /requirements.apt
 
-# Set user to root for installation
-USER root
+FROM ghcr.io/cloudynes/php-extended:${SOURCE_VERSION}
+COPY docker-entrypoint.sh /usr/local/bin/
+COPY --from=BUILDER /usr/sbin/unitd /usr/sbin/unitd
+COPY --from=BUILDER /usr/sbin/unitd-debug /usr/sbin/unitd-debug
+COPY --from=BUILDER /usr/lib/unit/ /usr/lib/unit/
+COPY --from=BUILDER /requirements.apt /requirements.apt
 
-# Install additional packages
-# RUN apk add --no-cache \
-RUN apt-get update 
+RUN ldconfig
 
-RUN apt-get -y install \
-    zlib1g-dev libfreetype6-dev \
-    curl libjpeg-dev \
-    libicu-dev libpng-dev \
-    libssl-dev mariadb-client
+RUN set -x \
+    && if [ -f "/tmp/libunit.a" ]; then \
+        mv /tmp/libunit.a /usr/lib/$(dpkg-architecture -q DEB_HOST_MULTIARCH)/libunit.a; \
+        rm -f /tmp/libunit.a; \
+    fi \
+    && mkdir -p /var/lib/unit/ \
+    && mkdir /docker-entrypoint.d/ \
+    && addgroup --system unit \
+    && adduser \
+        --system \
+        --disabled-login \
+        --ingroup unit \
+        --no-create-home \
+        --home /nonexistent \
+        --gecos "unit user" \
+        --shell /bin/false \
+        unit \
+    && apt update \
+    && apt --no-install-recommends --no-install-suggests -y install curl $(cat /requirements.apt) \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
+    && rm -f /requirements.apt \
+    && ln -sf /dev/stdout /var/log/unit.log && \
+    mkdir -p /var/lib/unit && chown -R unit:unit /var/run /run /var/lib/unit
 
-RUN apt-get -y install \
-    libzip-dev default-libmysqlclient-dev \
-    libc-client-dev libkrb5-dev
+USER unit
 
-# Preconfigure PHP Packages
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
-    docker-php-ext-configure imap --with-kerberos --with-imap-ssl
+STOPSIGNAL SIGTERM
 
-# Install additional PHP packages
-RUN docker-php-ext-install -j$(nproc) \
-    gd \
-    intl \
-    pdo_mysql \
-    mysqli \
-    opcache \
-    imap \
-    zip \
-    bcmath
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
-# RUN mkdir /var/lib/unit/certs
-# RUN chown -R nobody.nobody /var/lib/unit/certs /run
-
-COPY config.json /docker-entrypoint.d/config.json
-
-# USER nobody
-# ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-# CMD 
-# CMD [ "unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock" ]
-
-EXPOSE 8080
+CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]

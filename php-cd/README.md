@@ -1,0 +1,2 @@
+# PHP Continuous Deployment
+Image intended for use in init containers together with php-unit and/or php-bedrock. Contains Composer, WP-CLI and some scripts and tools for deploying and re-deploying containers.

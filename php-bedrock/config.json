@@ -42,7 +42,6 @@
                 "uri": [
                     "*.php",
                     "*.php/*",
-                    "/wp-admin/",
                     "/wp/wp-admin/"
                 ]
             }
@@ -61,7 +60,7 @@
         "php": {
             "type": "php",
             "environment": {
-                "WP_HOME": "http://127.0.0.1:8000"
+                "WP_HOME": "http://127.0.0.1:8080"
             },
             "options": {
                 "user": {
