@@ -26,8 +26,6 @@ ENV WP_CLI_CACHE_DIR="/tmp/wpcli-cache"             \
 RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar; chmod +x /usr/local/bin/wp; \
     wp --info --allow-root
 
-COPY config.json /docker-entrypoint.d/config.json
-
 RUN mkdir -p /app && chown -R unit:unit /app && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
 
 USER unit
