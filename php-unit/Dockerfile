@@ -27,6 +27,7 @@ RUN set -ex \
                 --tmp=/var/tmp \
                 --user=unit \
                 --group=unit \
+                --njs \
                 --openssl \
                 --libdir=/usr/lib/$DEB_HOST_MULTIARCH" \
     && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --ld-opt="$LD_OPT" --modules=/usr/lib/unit/debug-modules --debug \
