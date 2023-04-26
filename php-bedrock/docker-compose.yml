@@ -1,3 +1,4 @@
+version: "3.2"
 services:
   mysql:
     image: mysql:5.7
@@ -40,11 +41,14 @@ services:
       DATABASE_URL: mysql://wordpress:wordpress@mysql:3306/wordpress
       WP_HOME: http://localhost:8080
       WP_SITEURL: http://localhost:8080/wp
+
   php81:
     image: ghcr.io/cloudynes/php-bedrock:8.1
     build:
       context: .
-      dockerfile: ./8.1/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        SOURCE_VERSION: "8.1"
     ports:
       - 8080:8080
     depends_on:

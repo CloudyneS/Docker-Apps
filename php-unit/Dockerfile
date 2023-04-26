@@ -14,12 +14,12 @@ RUN set -ex \
     && mkdir -p /usr/lib/unit/modules /usr/lib/unit/debug-modules \
     && hg clone https://hg.nginx.org/unit \
     && cd unit \
-    && hg up 1.29.1 \
+    && hg up 1.29.1-1 \
     && NCPU="$(getconf _NPROCESSORS_ONLN)" \
     && DEB_HOST_MULTIARCH="$(dpkg-architecture -q DEB_HOST_MULTIARCH)" \
     && CC_OPT="$(DEB_BUILD_MAINT_OPTIONS="hardening=+all,-pie" DEB_CFLAGS_MAINT_APPEND="-Wp,-D_FORTIFY_SOURCE=2 -fPIC" dpkg-buildflags --get CFLAGS)" \
     && LD_OPT="$(DEB_BUILD_MAINT_OPTIONS="hardening=+all,-pie" DEB_LDFLAGS_MAINT_APPEND="-Wl,--as-needed -pie" dpkg-buildflags --get LDFLAGS)" \
-    && CONFIGURE_ARGS="--prefix=/usr \
+    && CONFIGURE_ARGS_MODULES="--prefix=/usr \
                 --state=/var/lib/unit \
                 --control=unix:/var/run/control.unit.sock \
                 --pid=/var/run/unit.pid \
@@ -27,9 +27,12 @@ RUN set -ex \
                 --tmp=/var/tmp \
                 --user=unit \
                 --group=unit \
-                --njs \
                 --openssl \
                 --libdir=/usr/lib/$DEB_HOST_MULTIARCH" \
+    && CONFIGURE_ARGS="$CONFIGURE_ARGS_MODULES \
+                --njs" \
+    && make -j $NCPU -C pkg/contrib .njs \
+    && export PKG_CONFIG_PATH=$(pwd)/pkg/contrib/njs/build \
     && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --ld-opt="$LD_OPT" --modules=/usr/lib/unit/debug-modules --debug \
     && make -j $NCPU unitd \
     && install -pm755 build/unitd /usr/sbin/unitd-debug \
@@ -38,11 +41,11 @@ RUN set -ex \
     && make -j $NCPU unitd \
     && install -pm755 build/unitd /usr/sbin/unitd \
     && make clean \
-    && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --modules=/usr/lib/unit/debug-modules --debug \
+    && ./configure $CONFIGURE_ARGS_MODULES --cc-opt="$CC_OPT" --modules=/usr/lib/unit/debug-modules --debug \
     && ./configure php \
     && make -j $NCPU php-install \
     && make clean \
-    && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --modules=/usr/lib/unit/modules \
+    && ./configure $CONFIGURE_ARGS_MODULES --cc-opt="$CC_OPT" --modules=/usr/lib/unit/modules \
     && ./configure php \
     && make -j $NCPU php-install \
     && ldd /usr/sbin/unitd | awk '/=>/{print $(NF-1)}' | while read n; do dpkg-query -S $n; done | sed 's/^\([^:]\+\):.*$/\1/' | sort | uniq > /requirements.apt
