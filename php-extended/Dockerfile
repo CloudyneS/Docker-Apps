@@ -10,7 +10,7 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 ENV PHPIZE_DEPS \
     zlib1g-dev libfreetype6-dev \
-    curl libjpeg-dev \
+    curl libjpeg-dev libwebp-dev \
     libicu-dev libpng-dev \
     libssl-dev libzip-dev \
     default-libmysqlclient-dev \
@@ -26,7 +26,7 @@ RUN set -eux; \
 	; \
 	\
     docker-php-ext-configure imap --with-kerberos --with-imap-ssl; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
 	docker-php-ext-install -j "$(nproc)" \
         gd \
         intl \
@@ -37,7 +37,6 @@ RUN set -eux; \
         zip \
         bcmath \
         ; \
-        \    
     # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
