@@ -55,6 +55,8 @@ RUN set -eux; \
 # update pecl channel definitions https://github.com/docker-library/php/issues/443
 	pecl update-channels; \
 	rm -rf /tmp/pear ~/.pearrc; \
+# Set higher memory limit as default
+    echo 'memory_limit = 1024M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini; \
 	\
 # smoke test
 	php --version
