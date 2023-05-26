@@ -25,7 +25,7 @@ def syncFolders(source: str, dest: str, print: bool = False, exclude: str = None
         exclude = ' '.join([f" --exclude '{x}' " for x in exclude])
     else:
         exclude = f"--exclude '{exclude}'"
-    command = f'rsync -ah --no-i-r --info=progress2 {exclude} {source} {dest} | rsyncy'
+    command = f'rsync -ah {exclude} {source} {dest}'
     if print:
         with subprocess.Popen(command, shell=True, stderr=subprocess.PIPE, stdout=sys.stdout) as cmd:
             cmd.wait()
