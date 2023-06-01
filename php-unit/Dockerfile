@@ -14,7 +14,7 @@ RUN set -ex \
     && mkdir -p /usr/lib/unit/modules /usr/lib/unit/debug-modules \
     && hg clone https://hg.nginx.org/unit \
     && cd unit \
-    && hg up 1.29.1-1 \
+    && hg up 1.30.0-1 \
     && NCPU="$(getconf _NPROCESSORS_ONLN)" \
     && DEB_HOST_MULTIARCH="$(dpkg-architecture -q DEB_HOST_MULTIARCH)" \
     && CC_OPT="$(DEB_BUILD_MAINT_OPTIONS="hardening=+all,-pie" DEB_CFLAGS_MAINT_APPEND="-Wp,-D_FORTIFY_SOURCE=2 -fPIC" dpkg-buildflags --get CFLAGS)" \
@@ -35,11 +35,11 @@ RUN set -ex \
     && export PKG_CONFIG_PATH=$(pwd)/pkg/contrib/njs/build \
     && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --ld-opt="$LD_OPT" --modules=/usr/lib/unit/debug-modules --debug \
     && make -j $NCPU unitd \
-    && install -pm755 build/unitd /usr/sbin/unitd-debug \
+    && install -pm755 build/sbin/unitd /usr/sbin/unitd-debug \
     && make clean \
     && ./configure $CONFIGURE_ARGS --cc-opt="$CC_OPT" --ld-opt="$LD_OPT" --modules=/usr/lib/unit/modules \
     && make -j $NCPU unitd \
-    && install -pm755 build/unitd /usr/sbin/unitd \
+    && install -pm755 build/sbin/unitd /usr/sbin/unitd \
     && make clean \
     && ./configure $CONFIGURE_ARGS_MODULES --cc-opt="$CC_OPT" --modules=/usr/lib/unit/debug-modules --debug \
     && ./configure php \

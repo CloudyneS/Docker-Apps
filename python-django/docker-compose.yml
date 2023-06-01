@@ -1,0 +1,14 @@
+version: "3.2"
+services:
+  py:
+    container_name: py
+    image: ghcr.io/cloudynes/python-django:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./config.json:/docker-entrypoint.d/config.json
+      - ./settings.py:/app/djtest/settings.py
+      - ./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
+    ports:
+      - 8123:8123
