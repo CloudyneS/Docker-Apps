@@ -1,0 +1,40 @@
+{
+    "listeners": {
+        "*:8123": {
+            "pass": "routes"
+        }
+    },
+
+    "routes": [
+        {
+            "match": {
+                "uri": "/static/*"
+            },
+
+            "action": {
+                "share": "/app/static/$uri"
+            }
+        },
+        {
+            "action": {
+                "pass": "applications/django"
+            }
+        }
+    ],
+
+    "applications": {
+        "django": {
+            "type": "python 3.11",
+            "path": "/app/",
+            "home": "/app/.venv/",
+            "module": "djtest.wsgi",
+            "environment": {
+                "DJANGO_SETTINGS_MODULE": "djtest.settings",
+                "DEBUG": "true",
+                "DB_ENGINE": "django.db.backends.sqlite3",
+                "DB_NAME": "/app/db.sqlite3",
+                "ALLOWED_HOSTS": "*"
+            }
+        }
+    }
+}
