@@ -91,7 +91,7 @@ jobs:
           cache-from: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
           cache-to: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
           context: ./php-cd
-          file: ./php-cd/Dockerfile
+          file: ./php-cd/go.Dockerfile
           push: true
           build-args: |
             SOURCE_VERSION=${{ matrix.php }}
