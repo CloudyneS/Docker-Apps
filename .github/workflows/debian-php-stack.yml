@@ -36,6 +36,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.AZURECR_URL }}
+          username: ${{ secrets.AZURECR_USER }}
+          password: ${{ secrets.AZURECR_SECRET }}
+      
       - name: Build and push php-extended
         uses: docker/build-push-action@v2
         with:
@@ -63,35 +70,33 @@ jobs:
           tags: |
               ghcr.io/cloudynes/php-unit:${{ matrix.php }}
               cloudyne/php-unit:${{ matrix.php }}
-      
+
       - name: Build and push php-bedrock
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=ghcr.io/cloudynes/php-bedrock:cache
-          cache-to: type=registry,ref=ghcr.io/cloudynes/php-bedrock:cache
+          cache-from: type=registry,ref=cloudyne.azurecr.io/php-bedrock:cache
+          cache-to: type=registry,ref=cloudyne.azurecr.io/php-bedrock:cache
           context: ./php-bedrock
           file: ./php-bedrock/Dockerfile
           push: true
           build-args: |
-              SOURCE_VERSION=${{ matrix.php }}
-          tags: |
-              ghcr.io/cloudynes/php-bedrock:${{ matrix.php }}
-              cloudyne/php-bedrock:${{ matrix.php }}
+            SOURCE_VERSION=${{ matrix.php }}
+          tags:
+            cloudyne.azurecr.io/php-bedrock:${{ matrix.php }}
       
       - name: Build and push php-cd
         uses: docker/build-push-action@v2
         with:
-          cache-from: type=registry,ref=ghcr.io/cloudynes/php-cd:cache
-          cache-to: type=registry,ref=ghcr.io/cloudynes/php-cd:cache
+          cache-from: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
+          cache-to: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
           context: ./php-cd
           file: ./php-cd/Dockerfile
           push: true
           build-args: |
-              SOURCE_VERSION=${{ matrix.php }}
-          tags: |
-              ghcr.io/cloudynes/php-cd:${{ matrix.php }}
-              cloudyne/php-cd:${{ matrix.php }}
-    
+            SOURCE_VERSION=${{ matrix.php }}
+          tags:
+            cloudyne.azurecr.io/php-cd:${{ matrix.php }}
+
   php-tag-latest:
     runs-on: ubuntu-latest
     needs: php-builds
@@ -129,10 +134,12 @@ jobs:
           docker tag ghcr.io/cloudynes/php-unit:8.2 ghcr.io/cloudynes/php-unit:latest
           docker push ghcr.io/cloudynes/php-unit:latest
 
-          docker pull ghcr.io/cloudynes/php-bedrock:8.2
-          docker tag ghcr.io/cloudynes/php-bedrock:8.2 ghcr.io/cloudynes/php-bedrock:latest
-          docker push ghcr.io/cloudynes/php-bedrock:latest
+          docker pull cloudyne.azurecr.io/php-bedrock:8.2
+          docker tag cloudyne.azurecr.io/php-bedrock:8.2 cloudyne.azurecr.io/php-bedrock:latest
+          docker push cloudyne.azurecr.io/php-bedrock:latest
 
-          docker pull ghcr.io/cloudynes/php-cd:8.2
-          docker tag ghcr.io/cloudynes/php-cd:8.2 ghcr.io/cloudynes/php-cd:latest
-          docker push ghcr.io/cloudynes/php-cd:latest
+          docker pull cloudyne.azurecr.io/php-cd:8.2
+          docker tag cloudyne.azurecr.io/php-cd:8.2 cloudyne.azurecr.io/php-cd:latest
+          docker push cloudyne.azurecr.io/php-cd:latest
+
+

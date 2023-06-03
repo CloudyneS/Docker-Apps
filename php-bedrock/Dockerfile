@@ -1,5 +1,5 @@
 ARG SOURCE_VERSION
-FROM ghcr.io/cloudynes/php-unit:${SOURCE_VERSION}
+FROM ghcr.io/cloudynes/php-unit:${SOURCE_VERSION} AS BUILDER
 
 LABEL Version="1.0"
 LABEL Maintainer="Cloudyne Systems"
@@ -10,28 +10,34 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 # Set the working directory and installation user
 USER root
+
 WORKDIR /app
 
-# ENV COMPOSER_HOME="/etc/composer"                   \
-ENV WP_CLI_CACHE_DIR="/tmp/wpcli-cache"             \
+# Install GIT and Composer
+RUN apt-get update && apt-get -y install git && apt-get clean \ 
+    && chown -R unit:unit /app \
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
+    && composer create-project --no-interaction --no-dev roots/bedrock .
+
+FROM ghcr.io/cloudynes/php-unit:${SOURCE_VERSION}
+
+USER root
+WORKDIR /app
+
+COPY --from=BUILDER --chown=unit:unit /app /app
+COPY --chown=unit:unit ./config.json /docker-entrypoint.d/unit.json
+
+ENV WP_CLI_CACHE_DIR="/tmp/wpcli/cache"             \
     WP_CLI_CONFIG_PATH="/etc/wpcli/wpcli.conf"      \
     WP_CLI_PACKAGES_DIR="/etc/wpcli/packages"
 
-# Uncomment these two lines to add Composer and composer-config.json
-# RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-#     mkdir -p /etc/composer && chown -R unit:unit /etc/composer && apt-get update && apt-get -y install git && apt-get clean 
-# ADD ./composer-config.json /etc/composer/config.json
-
-# # Add WP-CLI
-RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar; chmod +x /usr/local/bin/wp; \
-    wp --info --allow-root
-
-RUN mkdir -p /app && chown -R unit:unit /app && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+# Add WP-CLI and clear folders/caches
+RUN curl -o /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
+    && chmod +x /usr/local/bin/wp && mkdir -p /etc/wpcli/packages && chown -R unit:unit /etc/wpcli
 
 USER unit
 
-# Uncomment this line to preinstall Bedrock
-# RUN composer create-project --no-dev --no-interaction roots/bedrock .
+RUN /usr/local/bin/wp package install aaemnnosttv/wp-cli-dotenv-command
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 

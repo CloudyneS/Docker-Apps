@@ -28,3 +28,32 @@ services:
       dockerfile: Dockerfile
       args:
         SOURCE_VERSION: 8.2
+
+  go74:
+    image: ghcr.io/cloudynes/php-cd:7.4
+    build:
+      context: .
+      dockerfile: go.Dockerfile
+      args:
+        SOURCE_VERSION: 7.4
+  go80:
+    image: ghcr.io/cloudynes/php-cd:8.0
+    build:
+      context: .
+      dockerfile: go.Dockerfile
+      args:
+        SOURCE_VERSION: 8.0
+  go81:
+    image: ghcr.io/cloudynes/php-cd:8.1
+    build:
+      context: .
+      dockerfile: go.Dockerfile
+      args:
+        SOURCE_VERSION: 8.1
+  go82:
+    image: ghcr.io/cloudynes/php-cd:8.2
+    build:
+      context: .
+      dockerfile: go.Dockerfile
+      args:
+        SOURCE_VERSION: 8.2
