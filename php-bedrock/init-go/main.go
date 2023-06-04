@@ -100,7 +100,14 @@ func (ini *WpInitializer) InstallDatabase() error {
 			_ = ini.RunWpCli([]string{"db", "reset", "--yes"})
 		}
 
-		return ini.RunWpCli([]string{"db", "import", ini.DatabasePath})
+		isInstalled := ini.RunWpCli([]string{"core", "is-installed"})
+		fmt.Println(isInstalled)
+
+		if isInstalled != nil {
+			if strings.Contains(isInstalled.Error(), "exit code: 1") {
+				return ini.RunWpCli([]string{"db", "import", ini.DatabasePath})
+			}
+		}
 	}
 	return nil
 }
