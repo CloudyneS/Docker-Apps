@@ -1,0 +1,22 @@
+{
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://wpackagist.org",
+            "only": ["wpackagist-plugin/*", "wpackagist-theme/*"]
+        },
+        {
+            "type": "composer",
+            "url": "https://git.cloudyne.net/api/v4/group/26/-/packages/composer/packages.json",
+            "only": ["buildahome/*"]
+        },
+        {
+            "type": "composer",
+            "url": "https://git.cloudyne.net/api/v4/group/18/-/packages/composer/packages.json",
+            "only": ["cloudyne/*"]
+        }
+    ],
+    "config": {
+        "gitlab-domains": ["git.cloudyne.net"]
+    }
+}

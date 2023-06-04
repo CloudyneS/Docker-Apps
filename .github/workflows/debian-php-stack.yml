@@ -85,18 +85,18 @@ jobs:
           tags:
             cloudyne.azurecr.io/php-bedrock:${{ matrix.php }}
       
-      - name: Build and push php-cd
-        uses: docker/build-push-action@v2
-        with:
-          cache-from: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
-          cache-to: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
-          context: ./php-cd
-          file: ./php-cd/go.Dockerfile
-          push: true
-          build-args: |
-            SOURCE_VERSION=${{ matrix.php }}
-          tags:
-            cloudyne.azurecr.io/php-cd:${{ matrix.php }}
+      # - name: Build and push php-cd
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     cache-from: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
+      #     cache-to: type=registry,ref=cloudyne.azurecr.io/php-cd:cache
+      #     context: ./php-cd
+      #     file: ./php-cd/go.Dockerfile
+      #     push: true
+      #     build-args: |
+      #       SOURCE_VERSION=${{ matrix.php }}
+      #     tags:
+      #       cloudyne.azurecr.io/php-cd:${{ matrix.php }}
 
   php-tag-latest:
     runs-on: ubuntu-latest
@@ -146,8 +146,8 @@ jobs:
           docker tag cloudyne.azurecr.io/php-bedrock:8.2 cloudyne.azurecr.io/php-bedrock:latest
           docker push cloudyne.azurecr.io/php-bedrock:latest
 
-          docker pull cloudyne.azurecr.io/php-cd:8.2
-          docker tag cloudyne.azurecr.io/php-cd:8.2 cloudyne.azurecr.io/php-cd:latest
-          docker push cloudyne.azurecr.io/php-cd:latest
+      # docker pull cloudyne.azurecr.io/php-cd:8.2
+      # docker tag cloudyne.azurecr.io/php-cd:8.2 cloudyne.azurecr.io/php-cd:latest
+      # docker push cloudyne.azurecr.io/php-cd:latest
 
 
