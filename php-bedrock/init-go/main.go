@@ -36,7 +36,7 @@ type WpInitializer struct {
 	OverwriteDatabase    bool   `json:"overwriteDatabase" default:"false"`
 	UpdatePermissions    bool   `json:"updatePermissions" default:"true"`
 	ConvertUploadsToWebp bool   `json:"convertUploadsToWebp" default:"false"`
-	ConvertMissingOnly   bool   `json:"convertMissingOnly" default:"false"`
+	ConvertMissingOnly   bool   `json:"convertMissingOnly" default:"true"`
 	GenerateSalts        bool   `json:"generateSalts" default:"true"`
 	ActivateTheme        string `json:"activateTheme" default:""`
 }
@@ -179,9 +179,9 @@ func (ini *WpInitializer) Run() {
 	fmt.Println("Converting Uploads to WebP")
 	if ini.ConvertUploadsToWebp {
 		if ini.ConvertMissingOnly {
-			ini.HandleErrors(ini.RunWpCli([]string{"cloudyne-webp", "convert", "--missing-only"}))
-		} else {
 			ini.HandleErrors(ini.RunWpCli([]string{"cloudyne-webp", "convert"}))
+		} else {
+			ini.HandleErrors(ini.RunWpCli([]string{"cloudyne-webp", "convert", "--force-all=true"}))
 		}
 	}
 
