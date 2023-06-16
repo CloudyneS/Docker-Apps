@@ -14,6 +14,10 @@
             "type": "composer",
             "url": "https://git.cloudyne.net/api/v4/group/18/-/packages/composer/packages.json",
             "only": ["cloudyne/*"]
+        },
+        {
+            "type": "composer",
+            "url": "https://repo.packagist.com/cloudyne/"
         }
     ],
     "config": {
