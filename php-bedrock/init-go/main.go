@@ -26,17 +26,19 @@ type Initializer interface {
 }
 
 type WpInitializer struct {
-	ExitOnError       bool   `json:"exitOnError" default:"false"`
-	WebserverUser     string `json:"webserverUser" default:"unit"`
-	WebserverGroup    string `json:"webserverGroup" default:"root"`
-	ApplicationDir    string `json:"applicationDir" default:"/app"`
-	Permissions       string `json:"permissions" default:"770"`
-	ImportDatabase    bool   `json:"importDatabase" default:"false"`
-	DatabasePath      string `json:"databasePath" default:"/app/database.sql"`
-	OverwriteDatabase bool   `json:"overwriteDatabase" default:"false"`
-	UpdatePermissions bool   `json:"updatePermissions" default:"true"`
-	GenerateSalts     bool   `json:"generateSalts" default:"true"`
-	ActivateTheme     string `json:"activateTheme" default:""`
+	ExitOnError          bool   `json:"exitOnError" default:"false"`
+	WebserverUser        string `json:"webserverUser" default:"unit"`
+	WebserverGroup       string `json:"webserverGroup" default:"root"`
+	ApplicationDir       string `json:"applicationDir" default:"/app"`
+	Permissions          string `json:"permissions" default:"770"`
+	ImportDatabase       bool   `json:"importDatabase" default:"false"`
+	DatabasePath         string `json:"databasePath" default:"/app/database.sql"`
+	OverwriteDatabase    bool   `json:"overwriteDatabase" default:"false"`
+	UpdatePermissions    bool   `json:"updatePermissions" default:"true"`
+	ConvertUploadsToWebp bool   `json:"convertUploadsToWebp" default:"false"`
+	ConvertMissingOnly   bool   `json:"convertMissingOnly" default:"true"`
+	GenerateSalts        bool   `json:"generateSalts" default:"true"`
+	ActivateTheme        string `json:"activateTheme" default:""`
 }
 
 func (ini *WpInitializer) RunAsUser(username string, command string, arguments []string) error {
@@ -172,6 +174,16 @@ func (ini *WpInitializer) Run() {
 
 	fmt.Println("Installing Database")
 	ini.HandleErrors(ini.InstallDatabase())
+
+	// Handle WebP Conversions
+	fmt.Println("Converting Uploads to WebP")
+	if ini.ConvertUploadsToWebp {
+		if ini.ConvertMissingOnly {
+			ini.HandleErrors(ini.RunWpCli([]string{"cloudyne-webp", "convert"}))
+		} else {
+			ini.HandleErrors(ini.RunWpCli([]string{"cloudyne-webp", "convert", "--force-all=true"}))
+		}
+	}
 
 	fmt.Println("Updating Salts")
 	ini.HandleErrors(ini.UpdateSalts())
